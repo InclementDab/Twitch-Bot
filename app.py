@@ -75,7 +75,8 @@ class MainWindow(QtWidgets.QMainWindow):
                                               media_list=self.tts_media_list, 
                                               media_list_player=self.tts_media_list_player)
 
-        # Bot Background Thread
+
+        # Bot Background Thread eeee
         self.bot = Bot(self, args)
         self.bot_thread = BotThread(self.bot)
         self.bot_thread.start()
