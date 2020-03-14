@@ -51,6 +51,9 @@ class MainWindow(QtWidgets.QMainWindow):
             logging.debug("media_end_callback")
             media_list.remove_index(0)
             media_list_player.previous()
+
+        def media_list_player_played_cb(event, media_list_player):
+            logging.debug("media_list_player_played_cb")
             
 
         # Song Request VLC Player
@@ -62,6 +65,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.media_player.event_manager().event_attach(vlc.EventType.MediaPlayerEndReached, 
                                           media_end_callback, 
                                           media_list=self.media_list, 
+                                          media_list_player=self.media_list_player)
+        
+        self.media_list_player.event_manager().event_attach(vlc.EventType.MediaListPlayerPlayed, 
+                                          media_list_player_played_cb,
                                           media_list_player=self.media_list_player)
         
         # TTS VLC Player

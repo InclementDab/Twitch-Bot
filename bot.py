@@ -219,4 +219,14 @@ class Bot(commands.Bot):
             assert isinstance(cmd, commands.Command)
             await context.send(f"{cmd.name}: ")
 
+    @commands.command(name='song')
+    async def song(self, context):
+        assert isinstance(context, twitchio.dataclasses.Context)
 
+        pass
+
+    @commands.command(name='ban')
+    async def ban(self, context):
+        assert isinstance(context, twitchio.dataclasses.Context)
+        command_syntax, command_response = context.message.content.split(maxsplit=2)
+        await context.send(f"{command_response} has been Banned! Kappa")
