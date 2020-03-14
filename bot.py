@@ -5,6 +5,7 @@ import asyncio
 import tracemalloc
 import json5
 import requests
+import vlc
 from flask import Flask, escape, request
 
 import urlfetch
@@ -54,6 +55,8 @@ class Bot(commands.Bot):
    
     duo_partner = ''
     simple_commands = []
+    skip_threshold = 1 ##todo: make this a value of current view count (25% of view count)
+    skip_requests = []
 
     def __init__(self, app, args):
         self.Application = app
@@ -149,13 +152,15 @@ class Bot(commands.Bot):
         logging.error(error)
         await context.send(error)
 
-    def send_message(self, message):
-        pass
-
 
     @commands.command(name='dadjoke')
     async def dadjoke(self, context):
         response = urlfetch.get('https://api.scorpstuff.com/dadjokes.php')
+        await context.send(response.text)
+
+    @commands.command(name='followage')
+    async def followage(self, context):
+        response = urlfetch.get(f'https://twitch.api.scorpstuff.com/followed.php?caster={context.channel.name}&follower={context.author.name}')
         await context.send(response.text)
 
     @commands.command(name='duo')
@@ -164,7 +169,7 @@ class Bot(commands.Bot):
         if len(self.duo_partner.content) == 0:
             await context.send(f'All by myself PepeHands')
         else:
-            await context.send(f'Inclement is duoing with twitch.tv/{self.duo_partner.content}')
+            await context.send(f'I am duoing with twitch.tv/{self.duo_partner.content}')
 
     @commands.command(name='setduo', aliases=["set_duo, duoset, duo_set, editduo, edit_duo"])
     @commands.check(is_mod)
@@ -177,6 +182,8 @@ class Bot(commands.Bot):
     async def subcount(self, context):
         subcount = ''
         await context.send(f'{subcount} people have Subscribed')
+    
+    #### media commands ####
 
     @commands.command(name='play')
     @commands.check(is_mod)
@@ -187,6 +194,30 @@ class Bot(commands.Bot):
     @commands.check(is_mod)
     async def songrequest_pause(self, context):
         await self.media_session.vlc_player.pause()
+
+    @commands.command(name='song')
+    async def song(self, context):
+        assert isinstance(context, twitchio.dataclasses.Context)
+
+        pass
+
+    @commands.command(name='skip')
+    async def skip(self, context):
+        assert isinstance(context, twitchio.dataclasses.Context)
+        if self.Application.media_list_player.get_state() == vlc.State.Playing:
+            if context.author in self.skip_requests:
+                await context.send(f'{context.author.name} has already made a skip request!')
+            else:
+                self.skip_requests.append(context.author)
+                if len(self.skip_requests) >= self.skip_threshold:
+                    self.Application.onSkipPressed()
+                    await context.send(f'Skipping current song!')
+                    return
+                await context.send(f'{context.author.name} has voted to skip the current song! X more votes required to skip')
+        else:
+            await context.send('No song is playing!')
+
+    #####
 
     @commands.command(name='addcommand', aliases=['addcom'])
     @commands.check(is_mod)
@@ -219,14 +250,13 @@ class Bot(commands.Bot):
             assert isinstance(cmd, commands.Command)
             await context.send(f"{cmd.name}: ")
 
-    @commands.command(name='song')
-    async def song(self, context):
-        assert isinstance(context, twitchio.dataclasses.Context)
 
-        pass
 
     @commands.command(name='ban')
     async def ban(self, context):
         assert isinstance(context, twitchio.dataclasses.Context)
         command_syntax, command_response = context.message.content.split(maxsplit=2)
         await context.send(f"{command_response} has been Banned! Kappa")
+
+
+

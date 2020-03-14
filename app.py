@@ -47,13 +47,14 @@ class MainWindow(QtWidgets.QMainWindow):
         logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO if args.release == "1" else logging.DEBUG)
 
 
-        def media_end_callback(event, media_list, media_list_player):
-            logging.debug("media_end_callback")
+        def media_end_cb(event, media_list, media_list_player):
+            logging.debug("media_end_cb")
             media_list.remove_index(0)
             media_list_player.previous()
 
         def media_list_player_played_cb(event, media_list_player):
             logging.debug("media_list_player_played_cb")
+            self.bot.skip_requests.clear()
             
 
         # Song Request VLC Player
@@ -63,11 +64,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.media_player.stop()
         self.is_playing = 0
         self.media_player.event_manager().event_attach(vlc.EventType.MediaPlayerEndReached, 
-                                          media_end_callback, 
+                                          media_end_cb, 
                                           media_list=self.media_list, 
                                           media_list_player=self.media_list_player)
         
-        self.media_list_player.event_manager().event_attach(vlc.EventType.MediaListPlayerPlayed, 
+        self.media_player.event_manager().event_attach(vlc.EventType.MediaPlayerMediaChanged, 
                                           media_list_player_played_cb,
                                           media_list_player=self.media_list_player)
         
@@ -78,7 +79,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tts_media_player.stop()
         self.tts_enabled = True
         self.tts_media_player.event_manager().event_attach(vlc.EventType.MediaPlayerEndReached, 
-                                              media_end_callback, 
+                                              media_end_cb, 
                                               media_list=self.tts_media_list, 
                                               media_list_player=self.tts_media_list_player)
 
