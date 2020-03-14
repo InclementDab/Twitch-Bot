@@ -55,7 +55,7 @@ class Bot(commands.Bot):
    
     duo_partner = ''
     simple_commands = []
-    skip_threshold = 1 ##todo: make this a value of current view count (25% of view count)
+    skip_threshold = 2 ##todo: make this a value of current view count (25% of view count)
     skip_requests = []
 
     def __init__(self, app, args):
@@ -163,6 +163,11 @@ class Bot(commands.Bot):
         response = urlfetch.get(f'https://twitch.api.scorpstuff.com/followed.php?caster={context.channel.name}&follower={context.author.name}')
         await context.send(response.text)
 
+    @commands.command(name='advice')
+    async def advice(self, context):
+        response = urlfetch.get('https://api.scorpstuff.com/advice.php')
+        await context.send(response.text)
+
     @commands.command(name='duo')
     async def duo(self, context):
         assert isinstance(self.duo_partner, twitchio.Message)
@@ -180,7 +185,9 @@ class Bot(commands.Bot):
 
     @commands.command(name='subcount')
     async def subcount(self, context):
-        subcount = ''
+        assert isinstance(context, twitchio.dataclasses.Context)
+        stream = await context.channel.get_stream()
+        logging.debug(stream)
         await context.send(f'{subcount} people have Subscribed')
     
     #### media commands ####
@@ -252,7 +259,7 @@ class Bot(commands.Bot):
 
 
 
-    @commands.command(name='ban')
+    @commands.command(name='ban') #???
     async def ban(self, context):
         assert isinstance(context, twitchio.dataclasses.Context)
         command_syntax, command_response = context.message.content.split(maxsplit=2)
