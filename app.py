@@ -1,4 +1,4 @@
-import argparse
+import argparse, configparser
 import os, sys, threading
 import logging
 import asyncio
@@ -22,6 +22,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     # media player stuff
     vlc_instance = vlc.Instance() # --playlist-enqueue ???
+    tts_instance = vlc.Instance()
 
     # song request
     media_player = vlc_instance.media_player_new()
@@ -29,23 +30,29 @@ class MainWindow(QtWidgets.QMainWindow):
     media_list = vlc_instance.media_list_new()
 
     # tts request
-    tts_media_player = vlc_instance.media_player_new()
-    tts_media_list_player = vlc_instance.media_list_player_new()
-    tts_media_list = vlc_instance.media_list_new()
+    tts_media_player = tts_instance.media_player_new()
+    tts_media_list_player = tts_instance.media_list_player_new()
+    tts_media_list = tts_instance.media_list_new()
 
     
     # event stuff
     loop = asyncio.new_event_loop()
 
+    # config stuff
+    config = configparser.ConfigParser()
+
     def __init__(self, parent=None):
         super(MainWindow, self).__init__()
         self.ui = uic.loadUi('MainWindow.ui', self)
         
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--release')
-        args = parser.parse_args()
+        arg_parser = argparse.ArgumentParser()
+        arg_parser.add_argument('--release')
+        args = arg_parser.parse_args()
         logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO if args.release == "1" else logging.DEBUG)
 
+        
+        self.config.read('settings.ini')
+        default = self.config['DEFAULT']
 
         def media_end_cb(event, media_list, media_list_player):
             logging.debug("media_end_cb")
@@ -71,6 +78,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.media_player.event_manager().event_attach(vlc.EventType.MediaPlayerMediaChanged, 
                                           media_list_player_played_cb,
                                           media_list_player=self.media_list_player)
+        logging.error(self.config.sections())
+        self.media_player.audio_set_volume(int(default['SRVolume']))
         
         # TTS VLC Player
         self.tts_media_player.set_hwnd(int(self.ui.ttsFrame.winId()))
@@ -82,9 +91,10 @@ class MainWindow(QtWidgets.QMainWindow):
                                               media_end_cb, 
                                               media_list=self.tts_media_list, 
                                               media_list_player=self.tts_media_list_player)
+        self.tts_media_player.audio_set_volume(int(default['TTSVolume']))
 
 
-        # Bot Background Thread eeee
+        # Bot Background Thread
         self.bot = Bot(self, args)
         self.bot_thread = BotThread(self.bot)
         self.bot_thread.start()
@@ -93,14 +103,21 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.playPause.pressed.connect(self.onPlayPressed)
         self.ui.stopButton.pressed.connect(self.onStopPressed)
         self.ui.skipButton.pressed.connect(self.onSkipPressed)
-        self.ui.doStartBot.pressed.connect(self.onTest)
         self.ui.volumeSlider.valueChanged.connect(self.VolumeChanged)
 
         self.ui.ttsEnableButton.pressed.connect(self.onTTSEnablePressed)
         self.ui.ttsSkipButton.pressed.connect(self.onTTSSkipPressed)
+        self.ui.ttsVolumeSlider.valueChanged.connect(self.TTSVolumeChanged)
                   
             
-       
+      
+    def closeEvent(self, event):
+        self.config['DEFAULT'] = {'TTSVolume': self.tts_media_player.audio_get_volume(),
+                             'SRVolume': self.media_player.audio_get_volume()}
+        with open('settings.ini', 'w') as configfile:
+            self.config.write(configfile)
+
+        event.accept()
 
     def onPlayPressed(self):
         if (self.is_playing == 1): #pause
@@ -164,19 +181,12 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             logging.critical("Error in TTS Message, you may be rate limited")
 
-    def onTest(self):
-        #self.AddTTSMessage(text="juliet")    
-        #self.AddTTSMessage(text="brian")    
-        #self.AddTTSMessage(text="richard")    
-        self.tts_media_list.add_media(vlc.Media("https://polly.streamlabs.com/v1/speech?OutputFormat=ogg_vorbis&Text=juliet&VoiceId=Brian&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIHKNQTJ7BGLEFVZA%2F20200312%2Fus-west-2%2Fpolly%2Faws4_request&X-Amz-Date=20200312T180929Z&X-Amz-SignedHeaders=host&X-Amz-Expires=900&X-Amz-Signature=37e13c61666959953b347ee48cf926908b0d15127a0fc8fc4ffd8ea1f04b57e9"))
-        self.tts_media_list.add_media(vlc.Media("https://polly.streamlabs.com/v1/speech?OutputFormat=ogg_vorbis&Text=brian&VoiceId=Brian&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIHKNQTJ7BGLEFVZA%2F20200312%2Fus-west-2%2Fpolly%2Faws4_request&X-Amz-Date=20200312T180930Z&X-Amz-SignedHeaders=host&X-Amz-Expires=900&X-Amz-Signature=188d3c25141f3b2046777739cbb8915fbccb6e40ebc515db2df79f2b617941f1"))
-        self.tts_media_list.add_media(vlc.Media("https://polly.streamlabs.com/v1/speech?OutputFormat=ogg_vorbis&Text=richard&VoiceId=Brian&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIHKNQTJ7BGLEFVZA%2F20200312%2Fus-west-2%2Fpolly%2Faws4_request&X-Amz-Date=20200312T180930Z&X-Amz-SignedHeaders=host&X-Amz-Expires=900&X-Amz-Signature=fa52503ee9c661338f8a65cf2aca067c08da79b3f8442ade42aa8eee5227ab0b"))
-        self.tts_media_list_player.play()
-        #self.ui.videoTitle.setText(self.media_player.get_media().get_meta(vlc.Meta.NowPlaying))
 
     def VolumeChanged(self):
-        value = self.ui.volumeSlider.value()
-        self.media_player.audio_set_volume(value)
+        self.media_player.audio_set_volume(self.ui.volumeSlider.value())
+
+    def TTSVolumeChanged(self):
+        self.tts_media_player.audio_set_volume(self.ui.ttsVolumeSlider.value())
 
 
 

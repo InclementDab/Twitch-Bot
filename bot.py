@@ -28,7 +28,7 @@ class SimpleCommand(object):
 
     async def response(self, context):
         assert isinstance(context, twitchio.Context)
-        self.message = self.message.replace("$User", context.author.name)
+        self.message = self.message.replace("$User", context.message.author.name)
         for msg in self.message.splitlines():
             await context.send(msg)
 
@@ -220,7 +220,8 @@ class Bot(commands.Bot):
                     self.Application.onSkipPressed()
                     await context.send(f'Skipping current song!')
                     return
-                await context.send(f'{context.author.name} has voted to skip the current song! X more votes required to skip')
+                skip_difference = self.skip_threshold - len(self.skip_requests)
+                await context.send(f'{context.author.name} has voted to skip the current song! {skip_difference} more votes required to skip')
         else:
             await context.send('No song is playing!')
 

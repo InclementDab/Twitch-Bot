@@ -1,9 +1,1 @@
-[
-{name: "discord", aliases: ["disc"], message: "Dab your way into -> https://discord.gg/2whsUsm"}, 
-{name: "sens", aliases: [], message: "400 dpi @ 10 ingame / 45 scoped"}, 
-{name: "piledrivin", aliases: [], message: "In memory of https://twitter.com/InclementDeath/status/1208145092667678721 F in chat, team"}, 
-{name: "socials", aliases: [], message: "Slide into my twitter and hit that follow https://twitter.com/InclementDeath"}, 
-{name: "freshnuts", aliases: "noobhunter", message: "Freshnuts Submissions: http://bit.ly/2oxO3nw \n Noobhunter Submissions: http://bit.ly/NHClips"}, 
-{name: "jamesucks", aliases: [], message: "Kappa"}, 
-{name: "sr", aliases: ["songrequest"], message: "$User Song Request is done with Channel Points!"}, 
-{name: "car", aliases: [], message: "https://www.twitch.tv/inclementdab/clip/DifferentRespectfulKumquatDancingBanana"}]
+[{name: "discord", aliases: ["disc"], message: "Dab your way into -> https://discord.gg/2whsUsm"}, {name: "sens", aliases: [], message: "400 dpi @ 10 ingame / 45 scoped"}, {name: "piledrivin", aliases: [], message: "In memory of https://twitter.com/InclementDeath/status/1208145092667678721 F in chat, team"}, {name: "socials", aliases: [], message: "Slide into my twitter and hit that follow https://twitter.com/InclementDeath"}, {name: "freshnuts", aliases: "noobhunter", message: "Freshnuts Submissions: http://bit.ly/2oxO3nw \n Noobhunter Submissions: http://bit.ly/NHClips"}, {name: "jamesucks", aliases: [], message: "Kappa"}, {name: "sr", aliases: ["songrequest"], message: "$User Song Request is done with Channel Points! https://i.imgur.com/lvYUZ7t.png - You get 300 for following! ;)"}, {name: "car", aliases: [], message: "https://www.twitch.tv/inclementdab/clip/DifferentRespectfulKumquatDancingBanana"}, {name: "drops", aliases: [], message: "$User https://www.youtube.com/watch?v=d1YBv2mWll0"}, {name: "tts", aliases: [], message: "https://docs.google.com/document/d/1qLKdc3QArtn6PVuGf42EfoMuzvLE_ykWwU1RViEcrbU/edit"}]
