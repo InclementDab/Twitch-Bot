@@ -152,7 +152,7 @@ class MainWindow(QtWidgets.QMainWindow):
         return song
 
     def AddTTSMessage(self, text):
-        API = "https://us-central1-sunlit-context-217400.cloudfunctions.net/streamlabs-tts"
+        API = "https://streamlabs.com/polly/speak"
         PARAMS = {'text': text, 'voice':'Brian'}
         response = requests.post(url = API, data = PARAMS).json()
         logging.debug(response)

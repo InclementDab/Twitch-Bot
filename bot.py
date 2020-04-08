@@ -14,11 +14,18 @@ import twitchio
 from bot_helpers import *
 from twitchio.ext import commands
 from twitchio import webhook
+from enum import Enum
 
 from dotenv import load_dotenv
 
 from PyQt5 import QtCore
 
+
+
+class TTSVoice(Enum):
+    Brian = "Brian"
+    Ivy = "Ivy"
+    Justin = "Justin"
 
 class SimpleCommand(object):
     def __init__(self, name, aliases, message):
