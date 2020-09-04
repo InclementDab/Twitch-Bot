@@ -79,7 +79,7 @@ class Bot(commands.Bot):
         
         logging.info("Connecting to channel " + self.initial_channels[0])
 
-        logging.info(f'Loading Simple Commands')
+        logging.info(f'Loading Commands')
 
         with open('commands.json5') as json_file:
             self.simple_commands = json5.load(json_file)
@@ -90,6 +90,9 @@ class Bot(commands.Bot):
             self.add_command(new_cmd)
 
         logging.info(f'Commands Loaded')
+
+
+
 
     async def event_raw_pubsub(self, data):
         logging.debug(f'Raw Pubsub: {data}')
@@ -157,7 +160,7 @@ class Bot(commands.Bot):
     async def event_command_error(self, context, error):
         assert isinstance(context, twitchio.dataclasses.Context)
         logging.error(error)
-        await context.send(error)
+        #await context.send(error)
 
 
     @commands.command(name='dadjoke')

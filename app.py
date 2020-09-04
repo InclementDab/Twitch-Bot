@@ -65,7 +65,7 @@ class MainWindow(QtWidgets.QMainWindow):
         arg_parser = argparse.ArgumentParser()
         arg_parser.add_argument('--release')
         args = arg_parser.parse_args()
-        logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO if args.release == "1" else logging.DEBUG)
+        #logging.basicConfig(format='[%(levelname)s] %(message)s', level=logging.INFO if args.release == "1" else logging.DEBUG)
 
 
         # Bot Background Thread

@@ -1,1 +1,1 @@
-python app.py --release=1
+start python app.py --release=1
